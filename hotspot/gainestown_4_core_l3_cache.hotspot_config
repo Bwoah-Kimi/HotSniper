@@ -89,7 +89,7 @@
 		# is DTM employed?
 		-dtm_used			0
 		# model type - block or grid
-		-model_type			block
+		-model_type			grid
 		
 		# consider temperature-leakage loop within HotSpot?
 		-leakage_used 0

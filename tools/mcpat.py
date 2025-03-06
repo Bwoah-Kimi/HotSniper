@@ -345,6 +345,8 @@ def main(jobid, resultsdir, outputfile, powertype='dynamic', config=None, no_gra
     time0_begin = results['results']['global.time_begin']
     time0_end = results['results']['global.time_end']
     seconds = (time0_end - time0_begin)/1e15
+    # print("time0_begin: {}, time0_end: {}".format(time0_begin, time0_end))
+    # print("sampling interval: {}".format(seconds))
     results = power_stack(power_dat, results['config'], seconds, powertype)
     # Plot stack
     plot_labels = []

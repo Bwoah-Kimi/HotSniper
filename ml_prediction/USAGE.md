@@ -63,7 +63,28 @@ def gen_training_data():
 
 ```
 
-### Run simulation
+### Change floorplan type
+
+* Change model_type in hotspot configuration file from `block` to `grid`.
+* Grid granularity can also bechanged in the same configuration file.
+
+### Change logging interval
+
+Logging interval result in the sampling interval of power and thermal traces, which can be changed in `simulationcontrol/run.py`:
+
+```python
+    # NOTE: This determines the logging interval! (see issue in forked repo)
+    # interval time unit: 1ns
+    # periodicPower = 2000000 # 2ms
+    periodicPower = 200000  # 200us
+    # periodicPower = 250000
+    if "mediumDVFS" in base_configuration:
+        periodicPower = 250000
+    if "fastDVFS" in base_configuration:
+        periodicPower = 100000
+```
+
+## Run simulation
 
 Run inside the container:
 

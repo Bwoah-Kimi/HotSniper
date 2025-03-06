@@ -69,9 +69,7 @@ def save_output(
     benchmark_text = benchmark
     if len(benchmark_text) > 100:
         benchmark_text = benchmark_text[:100] + "__etc"
-    run = "results_{}_{}_{}".format(
-        BATCH_START, "+".join(base_configuration), benchmark_text
-    )
+    run = "results_{}_{}".format("+".join(base_configuration), benchmark_text)
     directory = os.path.join(RESULTS_FOLDER, run)
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -116,7 +114,8 @@ def save_output(
         elif "app_mapping." in f:
             shutil.copy(os.path.join(BENCHMARKS, f), directory)
 
-    create_plots(run)
+    # commented by SirisLi
+    # create_plots(run)
 
 
 def run(
@@ -138,7 +137,9 @@ def run(
         benchmark_options.append("hb_results_dir=%s" % BENCHMARKS)
 
     # NOTE: This determines the logging interval! (see issue in forked repo)
-    periodicPower = 1000000
+    # interval time unit: 1ns
+    # periodicPower = 2000000 # 2ms
+    periodicPower = 200000  # 200us
     # periodicPower = 250000
     if "mediumDVFS" in base_configuration:
         periodicPower = 250000
@@ -311,16 +312,44 @@ def get_workload(
         raise Exception("either parallelism or number_tasks needs to be set")
 
 
+def gen_test_data():
+    for benchmark in (
+        "splash2-barnes",
+        "splash2-fmm",
+        "splash2-ocean.cont",
+        "splash2-ocean.ncont",
+        "splash2-radiosity",
+        "splash2-raytrace",
+        "splash2-water.nsq",
+        "splash2-water.sp",
+        "splash2-cholesky",
+        "splash2-fft",
+        "splash2-lu.cont",
+        "splash2-lu.ncont",
+        "splash2-radix",
+    ):
+        min_parallelism = get_feasible_parallelisms(benchmark)[0]
+        max_parallelism = get_feasible_parallelisms(benchmark)[-1]
+        for freq in (1, 2):
+            for parallelism in (min(max_parallelism, NUMBER_CORES),):
+                # you can also use try_run instead
+                run(
+                    ["{:.1f}GHz".format(freq), "maxFreq", "slowDVFS"],
+                    get_instance(benchmark, parallelism, input_set="simsmall"),
+                )
+
+
 def gen_training_data():
     for benchmark in (
         "parsec-blackscholes",
-        "parsec-bodytrack",
-        "parsec-canneal",
-        "parsec-dedup",
-        "parsec-ferret" "parsec-fluidanimate",
-        "parsec-streamcluster",
-        "parsec-swaptions",
-        "parsec-x264",
+        # "parsec-bodytrack",
+        # "parsec-canneal",
+        # "parsec-dedup",
+        # "parsec-ferret",  ---- no parallelism!
+        # "parsec-fluidanimate", ---- infeasible parallelism!
+        # "parsec-streamcluster",
+        # "parsec-swaptions",
+        # "parsec-x264",
     ):
         min_parallelism = get_feasible_parallelisms(benchmark)[0]
         max_parallelism = get_feasible_parallelisms(benchmark)[-1]
@@ -456,6 +485,7 @@ def test_static_power():
 
 
 def main():
+    # gen_test_data()
     gen_training_data()
     # example()
     # test_static_power()
